@@ -1,0 +1,26 @@
+[micronic] {
+	-webkit-animation: micronic;
+	-moz-animation: micronic;
+	-ms-animation: micronic;
+	-o-animation: micronic;
+	animation: micronic;
+}
+-webkit-keyframes micronic {
+	
+}
+
+@-moz-keyframes micronic {
+	
+}
+
+@-ms-keyframes micronic {
+	
+}
+
+@-o-keyframes micronic {
+	
+}
+
+@keyframes micronic {
+	
+}

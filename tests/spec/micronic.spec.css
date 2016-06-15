@@ -1,0 +1,26 @@
+.other {
+	-webkit-animation: other;
+	-moz-animation: other;
+	-ms-animation: other;
+	-o-animation: other;
+	animation: other;
+}
+-webkit-keyframes other {
+	
+}
+
+@-moz-keyframes other {
+	
+}
+
+@-ms-keyframes other {
+	
+}
+
+@-o-keyframes other {
+	
+}
+
+@keyframes other {
+	
+}
