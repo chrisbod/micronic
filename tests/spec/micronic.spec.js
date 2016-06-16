@@ -172,6 +172,21 @@ describe("micronic", function() {
       )
     });
 
+    it("should clean itself up when the micronic attribute is removed", function (done) {
+      fifty(
+        function () {
+          var basic = document.querySelector("#basic");
+          basic.removeAttribute("micronic")
+        },
+        function () {
+          expect(basic.classList.length).toBe(0)
+        },
+        done
+        
+      )
+
+    })
+
   
  
 

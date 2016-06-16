@@ -17,7 +17,9 @@ this.micronic = {
 	"medium-height",
 	"large-height",
 	"x-large-height",
-	"xx-large-height"
+	"xx-large-height",
+	"portrait",
+	"landscape"
 	],
 	classSizes: {
         "zero-width": [0,0],
@@ -39,6 +41,7 @@ this.micronic = {
     },
     watchedElements: [],
     boxes: [],
+    values: [],
     addClass: function (name,dimensions) {
     	this.classNames.push(name);
     	this.classSizes[name] = dimensions;
@@ -53,9 +56,13 @@ this.micronic = {
 		}
 		window.addEventListener("resize",this,true)
 	},
-	update: function (target) {
-
-
+	getCustomDefinitions: function (element) {
+		var customDefs = element.getAttribute("micronic");
+		if (customDefs) {
+			return Function("return {"+customDefs+"}")();
+		}
+		return null
+		
 	},
 		handleEvent: function (event) {
 		var target = event.target;
@@ -67,11 +74,12 @@ this.micronic = {
 			var container = target.offsetParent || target.parentNode,
 				box = container.getBoundingClientRect(),
 				classList = target.classList,
-				customDefs = target.getAttribute("micronic");
+				customDefs = this.getCustomDefinitions(target)
+				
 			this.checkOrientation(target,box)
 			
 			if (customDefs) {
-				var customDefinitions = Function("return {"+customDefs+"}")();
+				var customDefinitions = Function("return {"+target.getAttribute("micronic")+"}")();
 
 				var disableDefault = customDefinitions.default === false;
 				var dontReflow = customDefinitions.watch === false;
@@ -106,14 +114,32 @@ this.micronic = {
 			elements.push(target)
 			var box = (target.offsetParent||target.parentNode).getBoundingClientRect()
 			this.boxes.push({width:box.width,height:box.height})
+			this.values.push(target.getAttribute("micronic"))
+
 		}
 		if (!this.watching) {
-			requestAnimationFrame(this.checkWatches.bind(this,elements,this.boxes))
+			requestAnimationFrame(this.checkWatches.bind(this,elements,this.boxes,this.values))
 			this.watching = true
 		}
 	},
-	checkWatches: function (elements,boxes) {
+	cleanElement: function (element) {
+		this.classNames.forEach(function (name) {
+			this.remove(name);
+		}, element.classList)
+	},
+	checkWatches: function (elements,boxes,values) {
 		elements.forEach(function (element,index) {
+			if (!element.hasAttribute("micronic")) {
+				this.cleanElement(element)
+				delete elements[index];
+				delete boxes[index];
+				delete values[index];
+				return
+			}
+			if (values[index]!=element.getAttribute("micronic")) {
+				this.cleanElement(element);
+				values[index] = element.getAttribute("micronic")
+			}
 			if (element.ownerDocument) {
 				var box = (element.offsetParent||element.parentNode).getBoundingClientRect()
 				var oldBox = boxes[index];
@@ -125,15 +151,20 @@ this.micronic = {
 					this.handleEvent({target:element})
 				}
 			} else {//detached
-				delete elements[index]
-				delete boxes[index]
+				this.cleanElement(element)
+				delete elements[index];
+				delete boxes[index];
+				delete values[index];
 			}
 		},this);
 		//this.unwatchByIndices(unwatches)
 		//console.log(unwatches)
-		requestAnimationFrame(this.checkWatches.bind(this,elements,boxes))
+		requestAnimationFrame(this.checkWatches.bind(this,elements,boxes,values))
 	},
 	determineClassBySize: function (target,classList,box,classSizes,className) {
+		if (!classSizes[className]) {//none dimensional class
+			return;
+		}
 		var dimensions = classSizes[className],
 			width = box.width,
 			height = box.height,
