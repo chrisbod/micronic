@@ -47,7 +47,7 @@ this.micronic = {
 				var customDefinitions = Function("return {"+customDefs+"}")();
 
 				var disableDefault = customDefinitions.default === false;
-				var dontReflow = customDefinitions.reflowing === false;
+				var dontReflow = customDefinitions.watch === false;
 				delete customDefinitions.reflowing
 				delete customDefinitions.default;
 				if (customDefinitions.classes) Object.keys(customDefinitions.classes).forEach(this.determineClassBySize.bind(this,target,classList,width,customDefinitions.classes))
@@ -96,9 +96,14 @@ this.micronic = {
 		requestAnimationFrame(this.checkWatches.bind(this,elements,boxes))
 	},
 	determineClassBySize: function (target,classList,width,classSizes,className) {
-		var dimensions = classSizes[className];
+		var dimensions = classSizes[className],
+			minWidth = dimensions[0],
+			maxWidth = 1 in dimensions ? dimensions[1] : -1;
 		if (typeof dimensions != "object") return;
-		if (width>=dimensions[0] && width <= dimensions[1]) {
+		if (maxWidth == -1) maxWidth = Number.POSITIVE_INFINITY;
+		
+		
+		if (width>=minWidth && width <= maxWidth) {
 			classList.add(className)
 		} else {
 			classList.remove(className)

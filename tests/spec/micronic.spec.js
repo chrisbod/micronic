@@ -135,6 +135,22 @@ describe("micronic", function() {
 
       );
       
+    });
+    it("should handle absent values and -1 values",function (done) {
+      var nomax1 = document.querySelector("#nomax1"),
+          nomax2 = document.querySelector("#nomax2");
+      expect(nomax1.classList.contains("nomax")).toBe(false)
+      expect(nomax2.classList.contains("nomax")).toBe(false)
+      nomax1.style.width = "100px";
+      nomax2.style.width = "100px";
+      fifty(
+        
+        function () {
+          expect(nomax1.classList.contains("nomax")).toBe(true)
+          expect(nomax2.classList.contains("nomax")).toBe(true)
+          done()
+        }
+      )
     })
   
  
