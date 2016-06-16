@@ -11,7 +11,25 @@ describe("micronic", function() {
         "large-width": [1201,1600],
         "x-large-width": [1601,2560],
         "xx-large-width": [2561,10000]
+    },
+    colors = {
+        "zero-width": [0,0,0],
+        "xx-small-width": [31,31,31],
+        "x-small-width": [63,63,63],
+        "small-width": [95,95,95],
+        "medium-width": [127,127,127],
+        "large-width": [159,159,159],
+        "x-large-width": [191,191,191],
+        "xx-large-width": [223,223,223]
     };
+  function fifty() {
+    var args = []
+    args.push.apply(args,arguments);
+    args.forEach(function (func,index) {
+      setTimeout(func,(index+1)*50)
+    })
+
+  }
   function setDimensions(width,height) {
     if (typeof width != "undefined") container.style.width = width;
     if (typeof height != "undefined") container.style.height = height;
@@ -27,7 +45,8 @@ describe("micronic", function() {
   beforeEach(function() {
     loadFixtures('init.html')
     
-    target=document.querySelector("#container [micronic]");
+    target=document.querySelector("#container [micronic]"),
+    colorTarget = document.querySelector(".color")
     container = target.offsetParent
     micronic.init()
 
@@ -35,55 +54,86 @@ describe("micronic", function() {
   afterEach(function () {
     setDimensions("")
   })
+  var timer = 1;
     classNames.forEach(function (className) {
          it("should set "+className+" as a classname when the container is "+classWidths[className][1]+"px wide", function (done) {
           setDimensions(classWidths[className][0]+"px");
-          setTimeout(function () {
-            expect(target.className).toBe(className);
-            setTimeout(done,100)
-          },50)
+          fifty(
+            function () {
+              expect(target.className).toBe(className);
+              expect(getComputedStyle(colorTarget).color).toBe("rgb("+colors[className].join(', ').replace(/\[|\]/g,'')+")");
+            },
+            done
+
+          );
+
       })
   });
     it("should not fire on a non-micronic element", function (done) {
       var div = document.createElement("div")
       div.className = "other"
-      document.body.appendChild(div)
-      setTimeout(function () {
-        expect(div.className).toBe("other");
-        setTimeout(done,100)
-      },50)
+      document.body.appendChild(div);
+      fifty(
+        function () {
+          expect(div.className).toBe("other");
+        },
+        done
+      )
     });
     it("should be able to add inline class definitions", function (done) {
       var custom = document.querySelector("#custom");
-      setTimeout(function () {
-        //console.log(custom.className)
-      expect(custom.classList.contains("custom")).toBe(true)
-      expect(custom.classList.contains("xx-small-width")).toBe(true)
-              setTimeout(done,100)
-            },50)
+      fifty(
+         function () {
+           expect(custom.classList.contains("custom")).toBe(true)
+            expect(custom.classList.contains("xx-small-width")).toBe(true)
+            },
+          done
+      )
     });
     it("should be able to disable default additions", function (done) {
       var custom = document.querySelector("#customDefault");
-      setTimeout(function () {
-      expect(custom.classList.contains("xx-small-width")).toBe(false)
-              setTimeout(done,100)
-            },50)
+      fifty(
+          function () {
+              expect(custom.classList.contains("xx-small-width")).toBe(false)
+            },
+          done
+      )
+        
 
     });
     it("should be able to update classes when the window is resized", function (done) {
       var scaling = document.querySelector("#scaling");
-      mockResize(400,400)
-      setTimeout(function () {
-        expect(scaling.className).toBe("small-width");
-        mockResize("1000","1000")
-        setTimeout(function () {
+      mockResize(400,400);
+      fifty(
+        function () {
+          expect(scaling.className).toBe("small-width");
+          mockResize("1000","1000");
+        },
+        function () {
           expect(scaling.className).toBe("medium-width");
           done()
-        },50)
-        
-      },50)
+        }
+
+      )
+      
     });
-    it("should be able to update classes if reflow detection is enabled", function () {
+
+    it("should be able to update classes on a reflowing floated element", function (done) {
+      var reflow = document.querySelector("#reflow")
+      fifty(
+        function () {
+           expect(reflow.classList.contains("xx-small-width")).toBe(true)
+           reflow.innerText = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+        
+        },
+        function () {
+
+          expect(reflow.classList.contains("small-width")).toBe(true)
+          done()
+        }
+        
+
+      );
       
     })
   

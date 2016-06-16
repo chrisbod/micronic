@@ -24,3 +24,32 @@
 @keyframes other {
 	
 }
+
+.color.zero-width {
+	color: rgb(0,0,0);
+}
+.color.xx-small-width {
+	color: rgb(31,31,31);
+}
+.color.x-small-width {
+	color: rgb(63,63,63);
+}
+.color.small-width {
+	color: rgb(95,95,95);
+}
+.color.medium-width {
+	color: rgb(127,127,127);
+}
+.color.large-width {
+	color: rgb(159,159,159);
+}
+.color.x-large-width {
+	color: rgb(191,191,191);
+}
+.color.xx-large-width {
+	color: rgb(223,223,223)
+}
+
+#reflow {
+	float: left;
+}
