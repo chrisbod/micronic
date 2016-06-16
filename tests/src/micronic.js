@@ -1,7 +1,24 @@
 this.micronic = {
 	document: this.document,
 	prefixes: ["webkit", "moz", "MS", "o", ""],
-	classNames:["zero-width","xx-small-width","x-small-width","small-width","medium-width","large-width","x-large-width","xx-large-width"],
+	classNames:[
+	"zero-width",
+	"xx-small-width",
+	"x-small-width",
+	"small-width",
+	"medium-width",
+	"large-width",
+	"x-large-width",
+	"xx-large-width",
+	"zero-height",
+	"xx-small-height",
+	"x-small-height",
+	"small-height",
+	"medium-height",
+	"large-height",
+	"x-large-height",
+	"xx-large-height"
+	],
 	classSizes: {
         "zero-width": [0,0],
         "xx-small-width": [1,96],
@@ -10,7 +27,15 @@ this.micronic = {
         "medium-width": [769,1200],
         "large-width": [1201,1600],
         "x-large-width": [1601,2560],
-        "xx-large-width": [2561,10000]
+        "xx-large-width": [2561,10000],
+        "zero-height": [0,-1,0,0],
+        "xx-small-height": [0,-1,1,96],
+        "x-small-height": [0,-1,97,288],
+        "small-height": [0,-1,289,768],
+        "medium-height": [0,-1,769,1200],
+        "large-height": [0,-1,1201,1600],
+        "x-large-height": [0,-1,1601,2560],
+        "xx-large-height": [0,-1,2561,10000]
     },
     watchedElements: [],
     boxes: [],
@@ -39,10 +64,10 @@ this.micronic = {
 		}
 		
 		if (target.hasAttribute("micronic")) {
-			var container = target.offsetParent;
-			var width = container.getBoundingClientRect().width,
-				classList = target.classList
-			var customDefs = target.getAttribute("micronic")
+			var container = target.offsetParent,
+				box = container.getBoundingClientRect(),
+				classList = target.classList,
+				customDefs = target.getAttribute("micronic")
 			if (customDefs) {
 				var customDefinitions = Function("return {"+customDefs+"}")();
 
@@ -50,11 +75,11 @@ this.micronic = {
 				var dontReflow = customDefinitions.watch === false;
 				delete customDefinitions.reflowing
 				delete customDefinitions.default;
-				if (customDefinitions.classes) Object.keys(customDefinitions.classes).forEach(this.determineClassBySize.bind(this,target,classList,width,customDefinitions.classes))
+				if (customDefinitions.classes) Object.keys(customDefinitions.classes).forEach(this.determineClassBySize.bind(this,target,classList,box,customDefinitions.classes))
 
 			}
 			if (!disableDefault) {
-			this.classNames.forEach(this.determineClassBySize.bind(this,target,classList,width,this.classSizes))
+			this.classNames.forEach(this.determineClassBySize.bind(this,target,classList,box,this.classSizes))
 			}
 			if (!dontReflow) {
 				this.watch(target)
@@ -95,15 +120,20 @@ this.micronic = {
 		//console.log(unwatches)
 		requestAnimationFrame(this.checkWatches.bind(this,elements,boxes))
 	},
-	determineClassBySize: function (target,classList,width,classSizes,className) {
+	determineClassBySize: function (target,classList,box,classSizes,className) {
 		var dimensions = classSizes[className],
+			width = box.width,
+			height = box.height,
 			minWidth = dimensions[0],
-			maxWidth = 1 in dimensions ? dimensions[1] : -1;
+			maxWidth = 1 in dimensions ? dimensions[1] : -1,
+			minHeight = 2 in dimensions ? dimensions[2] : -1,
+			maxHeight = 3 in dimensions ? dimensions[3] : -1
 		if (typeof dimensions != "object") return;
 		if (maxWidth == -1) maxWidth = Number.POSITIVE_INFINITY;
+		if (maxHeight == -1) maxHeight = Number.POSITIVE_INFINITY
+
 		
-		
-		if (width>=minWidth && width <= maxWidth) {
+		if (width>=minWidth && width <= maxWidth && minHeight && height >= minHeight && height <= maxHeight) {
 			classList.add(className)
 		} else {
 			classList.remove(className)

@@ -60,7 +60,8 @@ describe("micronic", function() {
           setDimensions(classWidths[className][0]+"px");
           fifty(
             function () {
-              expect(target.className).toBe(className);
+              expect(target.classList.length).toBe(2)
+              expect(target.classList.contains(className)).toBe(true);
               expect(getComputedStyle(colorTarget).color).toBe("rgb("+colors[className].join(', ').replace(/\[|\]/g,'')+")");
             },
             done
@@ -106,11 +107,11 @@ describe("micronic", function() {
       mockResize(400,400);
       fifty(
         function () {
-          expect(scaling.className).toBe("small-width");
+          expect(scaling.className).toBe("small-width small-height");
           mockResize("1000","1000");
         },
         function () {
-          expect(scaling.className).toBe("medium-width");
+          expect(scaling.className).toBe("medium-width medium-height");
           done()
         }
 
@@ -143,8 +144,7 @@ describe("micronic", function() {
       expect(nomax2.classList.contains("nomax")).toBe(false)
       nomax1.style.width = "100px";
       nomax2.style.width = "100px";
-      fifty(
-        
+      fifty(    
         function () {
           expect(nomax1.classList.contains("nomax")).toBe(true)
           expect(nomax2.classList.contains("nomax")).toBe(true)
