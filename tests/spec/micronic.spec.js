@@ -64,7 +64,9 @@ describe("micronic", function() {
     document.body.setAttribute("micronic","")
     fifty(
       function () {
+        var className = document.body.className;
         expect(document.body.classList.length).toBe(3);
+        expect(/portrait|landscape/.test(className)&&/height/.test(className)&&/width/.test(className)).toBe(true)
       },
       done
     )
@@ -169,7 +171,7 @@ describe("micronic", function() {
         }
       )
     });
-    
+
   
  
 
