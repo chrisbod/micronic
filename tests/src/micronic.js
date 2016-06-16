@@ -64,10 +64,12 @@ this.micronic = {
 		}
 		
 		if (target.hasAttribute("micronic")) {
-			var container = target.offsetParent,
+			var container = target.offsetParent || target.parentNode,
 				box = container.getBoundingClientRect(),
 				classList = target.classList,
-				customDefs = target.getAttribute("micronic")
+				customDefs = target.getAttribute("micronic");
+			this.checkOrientation(target,box)
+			
 			if (customDefs) {
 				var customDefinitions = Function("return {"+customDefs+"}")();
 
@@ -87,11 +89,22 @@ this.micronic = {
 			
 		}
 	},
+	checkOrientation: function (target,box) {
+		if (target.tagName == "BODY") {
+				if (box.width<=box.height) {
+					target.classList.remove("landscape");
+					target.classList.add("portrait");
+				} else {
+					target.classList.remove("portrait");
+					target.classList.add("landscape")
+				}
+			}
+		},
 	watch: function (target) {
 		var elements = this.watchedElements
 		if (elements.indexOf(target)==-1) {
 			elements.push(target)
-			var box = target.offsetParent.getBoundingClientRect()
+			var box = (target.offsetParent||target.parentNode).getBoundingClientRect()
 			this.boxes.push({width:box.width,height:box.height})
 		}
 		if (!this.watching) {
@@ -101,8 +114,8 @@ this.micronic = {
 	},
 	checkWatches: function (elements,boxes) {
 		elements.forEach(function (element,index) {
-			if (element.offsetParent) {
-				var box = element.offsetParent.getBoundingClientRect()
+			if (element.ownerDocument) {
+				var box = (element.offsetParent||element.parentNode).getBoundingClientRect()
 				var oldBox = boxes[index];
 				if (box.width!=oldBox.width) {
 					boxes[index] = {

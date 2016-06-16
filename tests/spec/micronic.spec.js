@@ -1,4 +1,6 @@
+
 describe("micronic", function() {
+
   var container,
       target,
       classNames = ["zero-width","xx-small-width","x-small-width","small-width","medium-width","large-width","x-large-width","xx-large-width"],
@@ -41,9 +43,11 @@ describe("micronic", function() {
     var resizeEvent = new Event("resize")
     window.dispatchEvent(resizeEvent)
   }
-
+  var bodyClassLength
   beforeEach(function() {
-    loadFixtures('init.html')
+    loadFixtures('init.html');
+
+    document.body.setAttribute("micronic","")
     
     target=document.querySelector("#container [micronic]"),
     colorTarget = document.querySelector(".color")
@@ -52,9 +56,20 @@ describe("micronic", function() {
 
   });
   afterEach(function () {
+    document.body.removeAttribute("micronic")
+    document.body.className = "";
     setDimensions("")
+  });
+  it("should set three classes to the body tag", function (done) {
+    document.body.setAttribute("micronic","")
+    fifty(
+      function () {
+        expect(document.body.classList.length).toBe(3);
+      },
+      done
+    )
+
   })
-  var timer = 1;
     classNames.forEach(function (className) {
          it("should set "+className+" as a classname when the container is "+classWidths[className][1]+"px wide", function (done) {
           setDimensions(classWidths[className][0]+"px");
@@ -81,6 +96,8 @@ describe("micronic", function() {
         done
       )
     });
+
+
     it("should be able to add inline class definitions", function (done) {
       var custom = document.querySelector("#custom");
       fifty(
@@ -151,7 +168,8 @@ describe("micronic", function() {
           done()
         }
       )
-    })
+    });
+    
   
  
 
