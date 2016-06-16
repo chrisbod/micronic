@@ -185,6 +185,31 @@ describe("micronic", function() {
         
       )
 
+    });
+    it("should restore any micronic styles that where hardcoded before it was attached", function (done) {
+      var preset = document.querySelector("#preset"),
+          originalClasses = [],
+          newClasses = [];
+      [].push.apply(originalClasses,preset.classList)
+      preset.setAttribute("micronic","");
+      fifty(
+        function () {
+          [].push.apply(newClasses,preset.classList);
+          preset.removeAttribute("micronic")
+
+        },
+        function () {
+          originalClasses.forEach(function (className) {
+            expect(preset.classList.contains(className)).toBe(true);
+          });
+          newClasses.forEach(function (className) {
+            expect(preset.classList.contains(className)).toBe(false)
+          })
+        },
+        done
+      )
+
+
     })
 
   
